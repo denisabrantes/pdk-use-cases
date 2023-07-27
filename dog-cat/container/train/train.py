@@ -36,7 +36,9 @@ class DeterminedClient(Determined):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Determined AI Experiment Runner")
+    parser = argparse.ArgumentParser(
+        description="Determined AI Experiment Runner"
+    )
 
     parser.add_argument(
         "--config",
@@ -67,7 +69,11 @@ def parse_args():
         type=str,
         help="Name of the Pachyderm's repository containing the dataset",
     )
-
+    parser.add_argument(
+        "--project",
+        type=str,
+        help="Name of the Pachyderm's project containing the repo",
+    )
     parser.add_argument(
         "--model",
         type=str,
@@ -81,11 +87,16 @@ def parse_args():
 
 
 def clone_code(repo_url, ref, dir):
-    print(f"Cloning code from: {repo_url}@{ref} --> {dir}")
     if os.path.isdir(dir):
+        print(f"Directory {dir} already exists. Fetching latest code...")
         repo = git.Repo(dir)
-        repo.remotes.origin.fetch()
+        ret = repo.remotes.origin.fetch()
+        if ret[0].flags == 4:
+            print("No new code to fetch.")
+        else:
+            print("New code fetched.")
     else:
+        print(f"Cloning code from: {repo_url}@{ref} --> {dir}")
         repo = git.Repo.clone_from(repo_url, dir)
     repo.git.checkout(ref)
 
@@ -107,13 +118,14 @@ def read_config(conf_file):
 # =====================================================================================
 
 
-def setup_config(config_file, repo, pipeline, job_id):
+def setup_config(config_file, repo, pipeline, job_id, project):
     config = read_config(config_file)
     config["data"]["pachyderm"]["host"] = os.getenv("PACHD_LB_SERVICE_HOST")
     config["data"]["pachyderm"]["port"] = os.getenv("PACHD_LB_SERVICE_PORT")
     config["data"]["pachyderm"]["repo"] = repo
     config["data"]["pachyderm"]["branch"] = job_id
     config["data"]["pachyderm"]["token"] = os.getenv("PAC_TOKEN")
+    config["data"]["pachyderm"]["project"] = project
 
     config["labels"] = [repo, job_id, pipeline]
 
@@ -134,20 +146,29 @@ def create_client():
 # =====================================================================================
 
 
-def execute_experiment(client, configfile, code_path, checkpoint):
+def execute_experiment(
+    client, configfile, code_path, checkpoint, pach_version=None
+):
     try:
         if checkpoint is None:
             parent_id = None
+            configfile["data"]["pachyderm"]["previous_commit"] = None
             exp = client.create_experiment(configfile, code_path)
         else:
             parent_id = checkpoint.training.experiment_id
-            exp = client.continue_experiment(configfile, parent_id, checkpoint.uuid)
+            configfile["data"]["pachyderm"]["previous_commit"] = pach_version
+            exp = client.continue_experiment(
+                configfile, parent_id, checkpoint.uuid
+            )
 
-        print(f"Created experiment with id='{exp.id}' (parent_id='{parent_id}'). Waiting for its completion...")
+        print(
+            f"Created experiment with id='{exp.id}' (parent_id='{parent_id}'). Waiting for its completion..."
+        )
 
-        # state = exp.wait()["experiment"]["state"]
         state = exp.wait()
-        print(f"Experiment with id='{exp.id}' ended with the following state: {state}")
+        print(
+            f"Experiment with id='{exp.id}' ended with the following state: {state}"
+        )
 
         if state == ExperimentState.COMPLETED:
             return exp
@@ -169,7 +190,9 @@ def run_experiment(client, configfile, code_path, model):
         return execute_experiment(client, configfile, code_path, None)
     else:
         print("Continuing experiment on DeterminedAI...")
-        return execute_experiment(client, configfile, None, version.checkpoint)
+        return execute_experiment(
+            client, configfile, None, version.checkpoint, version.name
+        )
 
 
 # =====================================================================================
@@ -186,7 +209,6 @@ def get_checkpoint(exp):
 
 
 def get_or_create_model(client, model_name, pipeline, repo):
-
     models = client.get_models(name=model_name)
 
     if len(models) > 0:
@@ -195,7 +217,9 @@ def get_or_create_model(client, model_name, pipeline, repo):
     else:
         print(f"Creating a new model : {model_name}")
         model = client.create_model(
-            name=model_name, labels=[pipeline, repo], metadata={"pipeline": pipeline, "repository": repo}
+            name=model_name,
+            labels=[pipeline, repo],
+            metadata={"pipeline": pipeline, "repository": repo},
         )
 
     return model
@@ -226,12 +250,6 @@ def write_model_info(file, model_name, model_version, pipeline, repo):
     model["pipeline"] = pipeline
     model["repo"] = repo
 
-    print("Printing model-info.......")
-    print(model_name)
-    print(model_version)
-    print(pipeline)
-    print(repo)
-
     with open(file, "w") as stream:
         try:
             yaml.safe_dump(model, stream)
@@ -249,7 +267,9 @@ def main():
     pipeline = os.getenv("PPS_PIPELINE_NAME")
     args = parse_args()
 
-    print(f"Starting pipeline: name='{pipeline}', repo='{args.repo}', job_id='{job_id}'")
+    print(
+        f"Starting pipeline: name='{pipeline}', repo='{args.repo}', job_id='{job_id}'"
+    )
 
     # --- Download code repository
 
@@ -267,29 +287,37 @@ def main():
 
     # --- Read and setup experiment config file. Then, run experiment
 
-    config = setup_config(config_file, args.repo, pipeline, job_id)
+    config = setup_config(
+        config_file, args.repo, pipeline, job_id, args.project
+    )
     client = create_client()
     model = get_or_create_model(client, args.model, pipeline, args.repo)
     exp = run_experiment(client, config, workdir, model)
 
     if exp is None:
         print("Aborting pipeline as experiment did not succeed")
-        return
+        exit(1)
 
     # --- Get best checkpoint from experiment. It may not exist if the experiment did not succeed
 
     checkpoint = get_checkpoint(exp)
 
     if checkpoint is None:
-        print("No checkpoint found (probably there was no data). Aborting pipeline")
+        print(
+            "No checkpoint found (probably there was no data). Aborting pipeline"
+        )
         return
 
     # --- Now, register checkpoint on model and download it
 
     register_checkpoint(checkpoint, model, job_id)
-    write_model_info("/pfs/out/model-info.yaml", args.model, job_id, pipeline, args.repo)
+    write_model_info(
+        "/pfs/out/model-info.yaml", args.model, job_id, pipeline, args.repo
+    )
 
-    print(f"Ending pipeline: name='{pipeline}', repo='{args.repo}', job_id='{job_id}'")
+    print(
+        f"Ending pipeline: name='{pipeline}', repo='{args.repo}', job_id='{job_id}'"
+    )
 
 
 # =====================================================================================

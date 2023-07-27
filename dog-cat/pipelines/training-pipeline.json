@@ -17,7 +17,7 @@
       "/bin/sh"
     ],
     "stdin": [
-      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases.git --git-ref main --sub-dir dog-cat/experiment --config const.yaml --repo dogs-and-cats --model dogs-and-cats"
+      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases.git --git-ref main --sub-dir dog-cat/experiment --config const.yaml --repo dogs-and-cats --model dogs-and-cats --project dogs-and-cats"
     ],
     "image": "gcr.io/dai-dev-554/denisd/denisd_cats_dogs_train:2.2",
     "secrets": [
