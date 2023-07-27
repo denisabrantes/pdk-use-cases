@@ -22,5 +22,14 @@ searcher:
     smaller_is_better: false
 entrypoint: model_def:DogCatModel
 resources:
+    resource_pool: gpu-pool
     slots_per_trial: 1
 max_restarts: 0
+environment:
+  pod_spec:
+    spec:
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Equal"
+          value: "present"
+          effect: "NoSchedule"
