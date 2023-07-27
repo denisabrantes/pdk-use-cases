@@ -18,7 +18,7 @@
     "stdin": [
       "python deploy.py --deployment-name dogcat-deploy --cloud-model-host gcp --cloud-model-bucket denisd-pdk-repo-mlde --resource-requests cpu=10,memory=8Gi --resource-limits cpu=10,memory=8Gi"
     ],
-    "image": "vmtyler/pdk:deploy_0.0.10",
+    "image": "gcr.io/dai-dev-554/denisd/denisd_cats_dogs_deploy:1.0",
     "secrets": [
       {
         "name": "pipeline-secret",
