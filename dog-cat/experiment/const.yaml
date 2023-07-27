@@ -2,11 +2,13 @@ name: Pipeline-Run-DogCat-1GPU
 workspace: Denisd
 project: pdk-dogs-and-cats
 data:
-    pachyderm_host: "34.132.236.24"
-    pachyderm_port: 80
-    pachyderm_repo: "dogs-and-cats"
-    pachyderm_branch: "master"
-    pachyderm_token: "test"
+    pachyderm:
+        host:
+        port:
+        repo:
+        branch:
+        token:
+        previous_commit:
 labels:
 hyperparameters:
     learning_rate: .005
