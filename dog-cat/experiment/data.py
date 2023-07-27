@@ -44,7 +44,8 @@ def download_pach_repo(pachyderm_host, pachyderm_port, repo, branch, root, token
     if not os.path.exists(root):
         os.makedirs(root)
 
-    client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port, auth_token=token)
+    #client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port, auth_token=token)
+    client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port)
     files = []
 
     for diff in client.diff_file((repo, branch), "/"):

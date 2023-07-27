@@ -3,11 +3,11 @@ workspace: Denisd
 project: pdk-dogs-and-cats
 data:
     pachyderm:
-        host:
-        port:
-        repo:
-        branch:
-        token:
+        host: 34.132.236.24
+        port: 80
+        repo: dogs-and-cats
+        branch: master
+        token: test
 labels:
 hyperparameters:
     learning_rate: .005
