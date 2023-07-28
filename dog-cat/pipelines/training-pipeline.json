@@ -19,7 +19,7 @@
     "stdin": [
       "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases.git --git-ref main --sub-dir dog-cat/experiment --config const.yaml --repo dogs-and-cats --model dogs-and-cats --project dogs-and-cats"
     ],
-    "image": "gcr.io/dai-dev-554/denisd/denisd_cats_dogs_train:2.3",
+    "image": "gcr.io/dai-dev-554/denisd/denisd_cats_dogs_train:1.0",
     "secrets": [
       {
         "name": "pipeline-secret",
@@ -40,7 +40,7 @@
         "name": "pipeline-secret",
         "key": "pachd_lb_service_host",
         "env_var": "PACHD_LB_SERVICE_HOST"
-      },  
+      },
       {
         "name": "pipeline-secret",
         "key": "pachd_lb_service_port",
