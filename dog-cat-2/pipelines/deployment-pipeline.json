@@ -1,0 +1,46 @@
+{
+  "pipeline": {
+    "name": "dogs-and-cats-deploy"
+  },
+  "description": "Deploys a model into production via the KServe Python SDK.",
+  "input": {
+    "pfs": {
+      "name": "data",
+      "repo": "dogs-and-cats-model",
+      "branch": "master",
+      "glob": "/"
+    }
+  },
+  "transform": {
+    "cmd": [
+      "/bin/sh"
+    ],
+    "stdin": [
+      "python deploy.py --deployment-name dogcat-deploy --cloud-model-host gcp --cloud-model-bucket denisd-pdk-repo-mlde --resource-requests cpu=10,memory=8Gi --resource-limits cpu=10,memory=8Gi"
+    ],
+    "image": "gcr.io/dai-dev-554/denisd/denisd_cats_dogs_deploy:1.0",
+    "secrets": [
+      {
+        "name": "pipeline-secret",
+        "key": "det_master",
+        "env_var": "DET_MASTER"
+      },
+      {
+        "name": "pipeline-secret",
+        "key": "det_user",
+        "env_var": "DET_USER"
+      },
+      {
+        "name": "pipeline-secret",
+        "key": "det_password",
+        "env_var": "DET_PASSWORD"
+      },
+      {
+        "name": "pipeline-secret",
+        "key": "kserve_namespace",
+        "env_var": "KSERVE_NAMESPACE"
+      }
+    ]
+  }
+
+}
