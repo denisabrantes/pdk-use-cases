@@ -1,5 +1,5 @@
 name: Pipeline-Run-DogCat-1GPU
-workspace: Denisd
+workspace: PDK Demos
 project: pdk-dogs-and-cats
 data:
     pachyderm:
