@@ -1,6 +1,6 @@
 name: Pipeline-Run-Brain-MRI-1GPU
-workspace: Cyrill
-project: pipeline-brain-mri
+workspace: PDK Demos
+project: pdk-brain-mri
 data:
   data_dir: "/data"
   repo: "mateuszbuda/brain-segmentation-pytorch"
@@ -32,8 +32,17 @@ searcher:
 min_validation_period:
   epochs: 1
 resources:
+  resource_pool: gpu-pool
   slots_per_trial: 1
 max_restarts: 0
 entrypoint: model_def:MRIUnetTrial
 profiling:
   enabled: True
+environment:
+  pod_spec:
+    spec:
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Equal"
+          value: "present"
+          effect: "NoSchedule"
