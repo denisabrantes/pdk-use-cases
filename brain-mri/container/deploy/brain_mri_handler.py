@@ -11,9 +11,9 @@ class BrainHandler(ImageClassifier):
     default handler. This handler takes an image from the reqeust body (shape and values) and returns a mask as a tensor, stored in a list of dicts.
 
     Here method postprocess() and preprocess() have been overridden while others are reused from parent class.
-    
+
     Author: Cyrill Hug / 01.17.2023
-    Based on: https://github.dev/pytorch/serve/blob/master/examples/image_classifier/mnist/mnist_handler.py#L1 
+    Based on: https://github.dev/pytorch/serve/blob/master/examples/image_classifier/mnist/mnist_handler.py#L1
     """
 
     #image_processing = transforms.Compose([
@@ -27,8 +27,8 @@ class BrainHandler(ImageClassifier):
             "record_shapes": True,
         }
 
-        
-        
+
+
     def preprocess(self, data):
         """Preprocess the data, fetches the image from the request body and converts to torch tensor.
         Args:
@@ -36,15 +36,15 @@ class BrainHandler(ImageClassifier):
         Returns:
             tensor: A torch tensor in correct format for brain mri unet model
         """
-        
+
         tensor_data = data[0]["data"]
         tensor_shape = data[0]["shape"]
         output = torch.FloatTensor(np.array(tensor_data).reshape(tensor_shape))
 
         input_img = output.unsqueeze(0)
-        
+
         return input_img
-        
+
 
     def postprocess(self, data):
         """The post process of BrainHandler stores the predicted mask in a list.
