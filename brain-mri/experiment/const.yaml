@@ -10,6 +10,7 @@ data:
     host:
     port:
     repo:
+    project:
     branch:
     token:
 hyperparameters:
