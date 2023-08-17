@@ -133,7 +133,7 @@ class PennFudanDataset(object):
 # ======================================================================================================================
 
 
-def download_data(self, data_config, data_dir):
+def download_data(data_config, data_dir):
 
     files = download_pach_repo(
         data_config["pachyderm"]["host"],
