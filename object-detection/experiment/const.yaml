@@ -1,0 +1,38 @@
+name: object_detection_const_hp_distributed
+workspace: PDK Demos
+project: pdk-object-detection
+labels:
+  - "object detection"
+environment:
+  image: determinedaicustomer/determined-demo-object-detection:0.17.13
+data:
+  udata_dir: "/data"
+  pachyderm:
+    host:
+    port:
+    repo:
+    project:
+    branch:
+    token:
+entrypoint: model_def:ObjectDetectionModel
+hyperparameters:
+  global_batch_size: 16
+  learning_rate: 0.02
+  momentum: 0.8
+  weight_decay: 0.0005
+  clip_grad: 0.95
+min_validation_period:
+  epochs: 4
+records_per_epoch: 136
+resources:
+  slots_per_trial: 4
+searcher:
+  max_length:
+    epochs: 4
+  metric: val_avg_iou
+  name: single
+  smaller_is_better: false
+profiling:
+  enabled: true
+  begin_on_batch: 0
+  end_after_batch: null
