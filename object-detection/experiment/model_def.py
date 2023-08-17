@@ -41,11 +41,8 @@ class ObjectDetectionModel(PyTorchTrial):
         self.download_directory = f"/tmp/data-rank{self.context.distributed.get_rank()}"
 
         self.data_config = self.context.get_data_config()
-        self.full_dir = "/"
-        self.data_dir = self.data_config["data_dir"]
-        self.full_dir = os.path.join(self.full_dir, self.download_directory.strip("/"), self.data_dir.strip("/"))
 
-        des = self.download_data(self.data_config, self.full_dir)
+        des = self.download_data(self.data_config, self.download_directory)
 
         # download_data(download_directory=self.download_directory, data_config=self.context.get_data_config(),)
 
