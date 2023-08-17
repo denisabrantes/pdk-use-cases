@@ -38,6 +38,8 @@ class ObjectDetectionModel(PyTorchTrial):
 
         # Create a unique download directory for each rank so they don't
         # overwrite each other.
+        
+        self.data_config = self.context.get_data_config()
         self.repo_dir = get_repo_path(self.data_config["pachyderm"]["host"], 
                                       self.data_config["pachyderm"]["port"], 
                                       self.data_config["pachyderm"]["repo"], 
@@ -47,8 +49,6 @@ class ObjectDetectionModel(PyTorchTrial):
                                       )
         
         self.download_directory = f"/tmp/data-rank{self.context.distributed.get_rank()}"
-
-        self.data_config = self.context.get_data_config()
 
         download_data(self.data_config, self.download_directory)
 
