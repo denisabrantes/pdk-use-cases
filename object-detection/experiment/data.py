@@ -139,7 +139,8 @@ def get_repo_path(pachyderm_host, pachyderm_port, repo, branch, token, project="
     '''
     client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port, auth_token=token)
     file_list = list(client.list_file(Commit(repo=repo, id=branch, project=project), '/'))
-    return file_list[0].file.path
+    folder_name = file_list[0].file.path.strip("/")
+    return folder_name
 
 
 def download_data(data_config, data_dir):
