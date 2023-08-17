@@ -33,7 +33,7 @@ min_validation_period:
 records_per_epoch: 136
 resources:
   resource_pool: gpu-pool
-  slots_per_trial: 4
+  slots_per_trial: 2
 searcher:
   max_length:
     epochs: 4
