@@ -132,6 +132,15 @@ class PennFudanDataset(object):
 
 # ======================================================================================================================
 
+def get_repo_path(pachyderm_host, pachyderm_port, repo, branch, token, project="default"):
+    '''
+    Adds the missing file path /data1. Without this, the model can't find the images to run the training
+    This will only work so long as all files are under a single folder, which is how pachctl.put_file works
+    '''
+    client = python_pachyderm.Client(host=pachyderm_host, port=pachyderm_port, auth_token=token)
+    file_list = list(client.list_file(Commit(repo=repo, id=branch, project=project), '/'))
+    return file_list[0].file.path
+
 
 def download_data(data_config, data_dir):
 

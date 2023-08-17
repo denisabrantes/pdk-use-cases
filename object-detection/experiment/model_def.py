@@ -24,7 +24,7 @@ import numpy as np
 import determined as det
 from determined.pytorch import DataLoader, LRScheduler, PyTorchTrial
 
-from data import download_data, get_transform, collate_fn, PennFudanDataset
+from data import get_repo_path, download_data, get_transform, collate_fn, PennFudanDataset
 
 TorchData = Union[Dict[str, torch.Tensor], Sequence[torch.Tensor], torch.Tensor]
 
@@ -38,6 +38,14 @@ class ObjectDetectionModel(PyTorchTrial):
 
         # Create a unique download directory for each rank so they don't
         # overwrite each other.
+        self.repo_dir = get_repo_path(self.data_config["pachyderm"]["host"], 
+                                      self.data_config["pachyderm"]["port"], 
+                                      self.data_config["pachyderm"]["repo"], 
+                                      self.data_config["pachyderm"]["branch"], 
+                                      self.data_config["pachyderm"]["token"], 
+                                      self.data_config["pachyderm"]["project"]
+                                      )
+        
         self.download_directory = f"/tmp/data-rank{self.context.distributed.get_rank()}"
 
         self.data_config = self.context.get_data_config()
@@ -48,7 +56,7 @@ class ObjectDetectionModel(PyTorchTrial):
 
         os.environ['TORCH_HOME'] = self.download_directory
 
-        dataset = PennFudanDataset(self.download_directory + "/PennFudanPed", get_transform())
+        dataset = PennFudanDataset(f"{self.download_directory}/{self.repo_dir}/PennFudanPed", get_transform())
 
         # Split 80/20 into training and validation datasets.
         train_size = int(0.8 * len(dataset))
