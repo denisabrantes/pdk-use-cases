@@ -5,6 +5,13 @@ labels:
   - "object detection"
 environment:
   image: determinedaicustomer/determined-demo-object-detection:0.17.13
+  pod_spec:
+    spec:
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Equal"
+          value: "present"
+          effect: "NoSchedule"
 data:
   udata_dir: "/data"
   pachyderm:
@@ -25,6 +32,7 @@ min_validation_period:
   epochs: 4
 records_per_epoch: 136
 resources:
+  resource_pool: gpu-pool
   slots_per_trial: 4
 searcher:
   max_length:
