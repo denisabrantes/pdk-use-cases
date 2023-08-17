@@ -42,7 +42,7 @@ class ObjectDetectionModel(PyTorchTrial):
 
         self.data_config = self.context.get_data_config()
 
-        des = self.download_data(self.data_config, self.download_directory)
+        download_data(self.data_config, self.download_directory)
 
         # download_data(download_directory=self.download_directory, data_config=self.context.get_data_config(),)
 
