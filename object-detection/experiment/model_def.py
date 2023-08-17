@@ -56,7 +56,9 @@ class ObjectDetectionModel(PyTorchTrial):
 
         os.environ['TORCH_HOME'] = self.download_directory
 
-        dataset = PennFudanDataset(f"{self.download_directory}/{self.repo_dir}/PennFudanPed", get_transform())
+        dataset_folder = f"{self.download_directory}/{self.repo_dir}/PennFudanPed"
+        print("--> Loading Dataset from this folder: ", dataset_folder)
+        dataset = PennFudanDataset(dataset_folder, get_transform())
 
         # Split 80/20 into training and validation datasets.
         train_size = int(0.8 * len(dataset))
