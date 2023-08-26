@@ -203,6 +203,7 @@ def create_inference_service(
     tolerations=None,
     resource_requirements={"requests": {}, "limits": {}},
     sa=None,
+    version="v2"
 ):
     repo = os.environ["PPS_PIPELINE_NAME"]
     project = os.environ["PPS_PROJECT_NAME"]
@@ -226,7 +227,7 @@ def create_inference_service(
             tolerations=tol,
             pytorch=(
                 V1beta1TorchServeSpec(
-                    protocol_version="v2",
+                    protocol_version=version,
                     storage_uri=f"gs://{bucket_name}/{model_name}",
                     resources=(
                         V1ResourceRequirements(
@@ -242,7 +243,7 @@ def create_inference_service(
             tolerations=tol,
             pytorch=(
                 V1beta1TorchServeSpec(
-                    protocol_version="v2",
+                    protocol_version=version,
                     storage_uri=f"s3://{bucket_name}/{model_name}",
                     resources=(
                         V1ResourceRequirements(
@@ -258,7 +259,7 @@ def create_inference_service(
             tolerations=tol,
             pytorch=(
                 V1beta1TorchServeSpec(
-                    protocol_version="v2",
+                    protocol_version=version,
                     storage_uri=f"s3://{commit}.master.{repo}.{project}/{model_name}",
                     resources=(
                         V1ResourceRequirements(
@@ -283,7 +284,7 @@ def create_inference_service(
         ),
         spec=V1beta1InferenceServiceSpec(predictor=predictor_spec),
     )
-
+    print(isvc)
     if replace:
         print("Replacing InferenceService with new version...")
         kclient.replace(deployment_name, isvc)

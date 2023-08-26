@@ -1,12 +1,12 @@
 {
   "pipeline": {
-    "name": "object-detection-deploy"
+    "name": "deploy"
   },
   "description": "Deploys a model into production via the KServe Python SDK.",
   "input": {
     "pfs": {
       "name": "data",
-      "repo": "object-detection-train",
+      "repo": "training",
       "branch": "master",
       "glob": "/"
     }
@@ -16,9 +16,9 @@
       "/bin/sh"
     ],
     "stdin": [
-      "python deploy.py --deployment-name object-detection-deploy --cloud-model-host gcp --cloud-model-bucket denisd-pdk-repo-models --resource-requests cpu=2,memory=8Gi --resource-limits cpu=10,memory=8Gi"
+      "python deploy.py --deployment-name detection-deploy --cloud-model-host aws --cloud-model-bucket denisd-pdk-repo-models --tolerations nvidia.com/gpu=present --resource-requests cpu=2,memory=4Gi --resource-limits cpu=10,memory=8Gi"
     ],
-    "image": "us-central1-docker.pkg.dev/dai-dev-554/pdk-registry/pdk_object_detection:1.0",
+    "image": "mendeza/pdk:deploy_0.0.23",
     "secrets": [
       {
         "name": "pipeline-secret",
@@ -41,5 +41,11 @@
         "env_var": "KSERVE_NAMESPACE"
       }
     ]
+  },
+  "resource_limits": {
+    "gpu": {
+      "type": "nvidia.com/gpu",
+      "number": 1
+    }
   }
 }

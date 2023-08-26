@@ -2,12 +2,10 @@ import os
 import time
 
 import torch
-from determined.common.experimental import ModelVersion
 from determined.experimental import Determined
 from determined.pytorch import load_trial_from_checkpoint_path
-from google.cloud import storage
-from kserve import KServeClient
 
+from kserve import KServeClient
 from common import (
     upload_model,
     get_version,
@@ -17,7 +15,7 @@ from common import (
     check_existence,
     create_inference_service,
     wait_for_deployment,
-    parse_args
+    parse_args,
 )
 
 # =====================================================================================
@@ -34,8 +32,8 @@ def create_scriptmodule(det_master, det_user, det_pw, model_name, pach_id):
     os.environ["SERVING_MODE"] = "true"
 
     start = time.time()
-    det_client = Determined(master=det_master, user=det_user, password=det_pw)
-    version = get_version(det_client, model_name, pach_id)
+    client = Determined(master=det_master, user=det_user, password=det_pw)
+    version = get_version(client, model_name, pach_id)
     checkpoint = version.checkpoint
     checkpoint_dir = checkpoint.download()
     trial = load_trial_from_checkpoint_path(
@@ -45,27 +43,36 @@ def create_scriptmodule(det_master, det_user, det_pw, model_name, pach_id):
     delta = end - start
     print(f"Checkpoint loaded in {delta} seconds.")
 
-    print("Creating ScriptModule from Determined checkpoint...")
-
+    print(f"Creating ScriptModule from Determined checkpoint...")
+    model = trial.model
+    model.eval()
     # Create ScriptModule
-    m = torch.jit.script(trial.model)
+    # m = torch.jit.script(model)
 
     # Save ScriptModule to file
-    torch.jit.save(m, "scriptmodule.pt")
+    # torch.jit.save(m, "scriptmodule.pt")
+    torch.save(model.state_dict(),'model.pth')
     print(f"ScriptModule created successfully.")
 
 
 # =====================================================================================
 
 
+# def create_mar_file(model_name, model_version):
+#     print(f"Creating .mar file for model '{model_name}'...")
+#     os.system(
+#         "torch-model-archiver --model-name %s --version %s --serialized-file ./scriptmodule.pt --handler ./dog_cat_handler.py --force"
+#         % (model_name, model_version)
+#     )
+#     print(f"Created .mar file successfully.")
+
 def create_mar_file(model_name, model_version):
     print(f"Creating .mar file for model '{model_name}'...")
     os.system(
-        "torch-model-archiver --model-name %s --version %s --serialized-file ./scriptmodule.pt --handler ./object_detection_handler.py --force"
+        "torch-model-archiver --model-name %s --version %s --model-file ./model-xview.py --handler ./fasterrcnn_handler.py --serialized-file ./model.pth --extra-files ./index_to_name.json --force"
         % (model_name, model_version)
     )
     print(f"Created .mar file successfully.")
-
 
 # =====================================================================================
 
@@ -99,6 +106,8 @@ model_snapshot={"name":"startup.cfg","modelCount":1,"models":{"%s":{"%s":{"defau
     return model_files
 
 
+# =====================================================================================
+
 def main():
     args = parse_args()
     det = DeterminedInfo()
@@ -131,7 +140,6 @@ def main():
     )
 
     # Instantiate KServe Client using kubeconfig
-
     if args.k8s_config_file:
         print(f"Using Configured K8s Config File at {args.k8s_config_file}")
         kclient = KServeClient(config_file=args.k8s_config_file)
@@ -143,9 +151,13 @@ def main():
 
     resource_requirements = {"requests": {}, "limits": {}}
     if args.resource_requests:
-        resource_requirements["requests"] = dict([i.split("=") for i in args.resource_requests])
+        resource_requirements["requests"] = dict(
+            [i.split("=") for i in args.resource_requests]
+        )
     if args.resource_limits:
-        resource_requirements["limits"] = dict([i.split("=") for i in args.resource_limits])
+        resource_requirements["limits"] = dict(
+            [i.split("=") for i in args.resource_limits]
+        )
     # Create or replace inference service
     create_inference_service(
         kclient,
@@ -158,11 +170,14 @@ def main():
         args.cloud_model_bucket,
         args.tolerations,
         resource_requirements,
-        args.service_account_name
+        args.service_account_name,
+        "v1",
     )
     if args.wait and args.cloud_model_host:
         # Wait for InferenceService to be ready for predictions
-        wait_for_deployment(kclient, ksrv.namespace, args.deployment_name, model.name)
+        wait_for_deployment(
+            kclient, ksrv.namespace, args.deployment_name, model.name
+        )
 
     print(
         f"Ending pipeline: deploy-name='{args.deployment_name}', model='{model.name}', version='{model.version}'"
