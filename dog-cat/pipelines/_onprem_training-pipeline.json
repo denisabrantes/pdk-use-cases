@@ -6,7 +6,7 @@
   "input": {
     "pfs": {
       "name": "data",
-      "repo": "dogs-and-cats",
+      "repo": "dogs-and-cats-data",
       "branch": "master",
       "glob": "/",
       "empty_files": true
@@ -18,7 +18,7 @@
       "/bin/sh"
     ],
     "stdin": [
-      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases.git --git-ref main --sub-dir dog-cat/experiment --config const.yaml --repo dogs-and-cats --model dogs-and-cats --project dogs-and-cats"
+      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases.git --git-ref main --sub-dir dog-cat/experiment --config const.yaml --repo dogs-and-cats-data --model dogs-and-cats --project pdk-dogs-and-cats"
     ],
     "image": "us-central1-docker.pkg.dev/dai-dev-554/denisd-registry/denisd_cats_dogs_train:1.0",
     "secrets": [
