@@ -32,5 +32,5 @@ environment:
       tolerations:
         - key: "nvidia.com/gpu"
           operator: "Equal"
-          value: "present"
+          value: "true"
           effect: "NoSchedule"
