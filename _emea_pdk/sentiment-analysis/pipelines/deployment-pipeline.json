@@ -17,7 +17,6 @@
     ],
     "stdin": [
       "python deploy.py --deployment-name finbert-deploy --cloud-model-host gcp --cloud-model-bucket pdk-demo-models --resource-requests cpu=2,memory=8Gi --resource-limits cpu=10,memory=8Gi"
-
     ],
     "image": "vmtyler/pdk:deploy_finbert_0.0.4",
     "secrets": [
