@@ -19,7 +19,7 @@
     "stdin": [
       "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases-dev.git --git-ref main --sub-dir object-detection/experiment --config const.yaml --repo object-detection-data --model sat-detection --project pdk-object-detection"
     ],
-    "image": "vmtyler/pdk:train_0.1.1",
+    "image": "us-central1-docker.pkg.dev/dai-dev-554/pdk-registry/pdk_model_training:1.0",
     "secrets": [
       {
         "name": "pipeline-secret",

@@ -16,9 +16,9 @@
       "/bin/sh"
     ],
     "stdin": [
-      "python deploy.py --deployment-name detection-deploy --cloud-model-host aws --cloud-model-bucket denisd-pdk-repo-models --tolerations nvidia.com/gpu=present --resource-requests cpu=2,memory=4Gi --resource-limits cpu=10,memory=8Gi"
+      "python deploy.py --deployment-name detection-deploy --cloud-model-host gcp --cloud-model-bucket denisd-pdk-repo-models --tolerations nvidia.com/gpu=present --resource-requests cpu=2,memory=4Gi --resource-limits cpu=10,memory=8Gi"
     ],
-    "image": "mendeza/pdk:deploy_0.0.23",
+    "image": "us-central1-docker.pkg.dev/dai-dev-554/pdk-registry/pdk_object_detection_deploy:2.1",
     "secrets": [
       {
         "name": "pipeline-secret",
@@ -41,11 +41,5 @@
         "env_var": "KSERVE_NAMESPACE"
       }
     ]
-  },
-  "resource_limits": {
-    "gpu": {
-      "type": "nvidia.com/gpu",
-      "number": 1
-    }
   }
 }
