@@ -1,12 +1,12 @@
 {
   "pipeline": {
-    "name": "deploy"
+    "name": "Model_Deployment"
   },
   "description": "Deploys a model into production via the KServe Python SDK.",
   "input": {
     "pfs": {
       "name": "data",
-      "repo": "training",
+      "repo": "Model_Training",
       "branch": "master",
       "glob": "/"
     }

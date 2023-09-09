@@ -1,6 +1,6 @@
 {
   "pipeline": {
-    "name": "training"
+    "name": "Model_Training"
   },
   "description": "Detects changed files into a repository and triggers a retraining on that dataset",
   "input": {
@@ -17,7 +17,7 @@
       "/bin/sh"
     ],
     "stdin": [
-      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases-dev.git --git-ref main --sub-dir object-detection/experiment --config const.yaml --repo object-detection-data --model sat-detection --project pdk-object-detection"
+      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases.git --git-ref main --sub-dir object-detection/experiment --config const.yaml --repo object-detection-data --model sat-detection --project pdk-object-detection"
     ],
     "image": "us-central1-docker.pkg.dev/dai-dev-554/pdk-registry/pdk_model_training:1.0",
     "secrets": [
