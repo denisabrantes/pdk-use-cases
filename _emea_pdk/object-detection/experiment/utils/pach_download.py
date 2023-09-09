@@ -29,14 +29,13 @@ def get_pach_repo_folder(
     )
 
     for file_info in client.pfs.walk_file(file=File.from_uri(f"{project}/{repo}@{branch}")):
-        src_path = file_info.file.path
-        #print(f"Got src='{src_path}'")
+            src_path = file_info.file.path
 
-        if file_info.file_type != FileType.FILE:
-            if src_path != "/":
-                folder_name  = src_path
-                break;
-    print("Using Folder: ", folder_name)
+            if file_info.file_type != FileType.FILE:
+                if src_path != "/":
+                    folder_name  = src_path
+                    break;
+    print("Repository Folder: ", folder_name)
     return folder_name.replace("/","")
 
 
@@ -55,19 +54,19 @@ def download_full_pach_repo(
     if not os.path.exists(root):
         os.makedirs(root)
 
-    client = python_pachyderm.Client(
+    client = pachyderm_sdk.Client(
         host=pachyderm_host, port=pachyderm_port, auth_token=token
     )
 
     for file_info in client.pfs.walk_file(file=File.from_uri(f"{project}/{repo}@{branch}")):
-        src_path = file_info.file.path
-        des_path = os.path.join(root, src_path[1:])
-        print(f"Saving File: '{des_path}'")
+            src_path = file_info.file.path
+            des_path = os.path.join(root, src_path[1:])
+            print(f"Saving File: '{des_path}'")
 
-        if file_info.file_type == FileType.FILE:
-            if src_path != "":
-                src_file = client.pfs.pfs_file(file=File.from_uri(f"{project}/{repo}@{branch}:{src_path}"))
-                with safe_open_wb(des_path) as dest_file:
-                    shutil.copyfileobj(src_file, dest_file)
+            if file_info.file_type == FileType.FILE:
+                if src_path != "":
+                    src_file = client.pfs.pfs_file(file=File.from_uri(f"{project}/{repo}@{branch}:{src_path}"))
+                    with safe_open_wb(des_path) as dest_file:
+                        shutil.copyfileobj(src_file, dest_file)
     print("Download operation ended")
     return root
