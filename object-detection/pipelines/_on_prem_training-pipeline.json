@@ -17,7 +17,7 @@
       "/bin/sh"
     ],
     "stdin": [
-      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases-dev.git --git-ref main --sub-dir object-detection/experiment --config const.yaml --repo object-detection-data --model sat-detection --project pdk-object-detection"
+      "python train.py --git-url https://git@github.com:/denisabrantes/pdk-use-cases-dev.git --git-ref main --sub-dir object-detection/experiment --config const.yaml --repo object-detection-data --model object-detection --project pdk-object-detection"
     ],
     "image": "vmtyler/pdk:train_0.1.1",
     "secrets": [
