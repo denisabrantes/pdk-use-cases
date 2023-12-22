@@ -6,12 +6,12 @@
 from __future__ import absolute_import, division, print_function
 
 import csv
-import logging
-import os
 import sys
+import os
+import torch
 
 import numpy as np
-import torch
+import logging
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
