@@ -31,3 +31,7 @@ resources:
     resource_pool: gpu-pool
     slots_per_trial: 1
 entrypoint: model_def:ChurnTrial
+checkpoint_storage:
+  save_experiment_best: 10
+  save_trial_best: 1
+  save_trial_latest: 1
